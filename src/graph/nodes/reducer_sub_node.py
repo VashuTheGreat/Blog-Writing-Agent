@@ -1,0 +1,65 @@
+import logging
+from src.models.ImageSpec_model import State,GlobalImagePlan
+from src.utils.asyncHandler import asyncHandler
+from langchain.messages import SystemMessage,HumanMessage
+from src.prompts import IMAGE_PLACEHOLDER_GENERATION
+from src.llm import llm
+from src.exception import MyException
+import sys
+import os
+from src.components.image_generation import ImageGeneration
+@asyncHandler
+async def reducer_sub_llm(state:State)->State:
+    logging.info("Calling LLM for image placeholder planning")
+    output=await llm.with_structured_output(GlobalImagePlan)\
+    .ainvoke(
+        [
+        SystemMessage(content=IMAGE_PLACEHOLDER_GENERATION),
+        HumanMessage(content=state['prompt_markdown'])
+        ]
+    )
+    state['output']=output
+    logging.info("Successfully generated image placeholder plan")
+    return state
+
+@asyncHandler
+async def reducer_sub_image(state:State)->State:
+    output=state['output']
+    image_generator=ImageGeneration()
+    if not output:
+        raise MyException("output from reducer_sub not found",sys)
+    
+    os.makedirs("images",exist_ok=True)
+
+    logging.info(f"Starting image generation for {len(output.images)} images")
+    for image_con in output.images:
+        logging.debug(f"Generating image: {image_con.filename} with prompt: {image_con.prompt[:50]}...")
+        image=await image_generator.generateImage(prompt=image_con.prompt)
+        image.save(image_con.filename)
+    logging.info("All images generated successfully")
+    return state
+
+@asyncHandler
+async def merge_images_and_md(state: State) -> State:
+    output = state["output"]
+    md = output.md_with_placeholders
+    
+    logging.info(f"Merging {len(output.images)} images into Markdown")
+    for im in output.images:
+        alt_text = (
+            im.filename.split("/")[-1]
+            .replace(".png", "")
+            .replace("_", " ")
+        )
+
+        md_image_tag = f"![{alt_text}]../({im.filename})"
+        md = md.replace(im.placeholder, md_image_tag)
+
+    state["final_md"] = md
+    logging.info("Markdown merging completed")
+    return state    
+
+
+
+
+
