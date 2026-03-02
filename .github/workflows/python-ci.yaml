@@ -53,9 +53,9 @@ jobs:
             git pull origin main
             uv sync
             pkill -f uvicorn || true
-            nohup uv run uvicorn Application.app:app \
+            setsid uv run uvicorn Application.app:app \
               --host 0.0.0.0 \
               --port 8000 \
               > output.log 2>&1 < /dev/null &
-            sleep 3
+            sleep 5
             echo "Deployment successful"
