@@ -18,6 +18,10 @@ async def reducer_sub_llm(state:State)->State:
         HumanMessage(content=state['prompt_markdown'])
         ]
     )
+    if not output:
+        logging.error("LLM failed to return a valid image placeholder plan (output is None)")
+        raise MyException("Failed to generate image placeholder plan from LLM", sys)
+    
     state['output']=output
     logging.info("Successfully generated image placeholder plan")
     return state
@@ -52,7 +56,7 @@ async def merge_images_and_md(state: State) -> State:
             .replace("_", " ")
         )
 
-        md_image_tag = f"![{alt_text}]../({im.filename})"
+        md_image_tag = f"![{alt_text}](../{im.filename})"
         md = md.replace(im.placeholder, md_image_tag)
 
     state["final_md"] = md

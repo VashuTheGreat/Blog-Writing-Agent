@@ -4,7 +4,7 @@
 import sys
 import os
 import asyncio
-
+import logging
 PROJECT_ROOT = os.getcwd()
 print(PROJECT_ROOT)
 if PROJECT_ROOT not in sys.path:
@@ -14,5 +14,7 @@ from src.logger import *
 from src.graph.Compile_graph import run
 
 if __name__ == "__main__":
-    asyncio.run(run("State of Multimodal LLMs in 2026"))
+    out=asyncio.run(run("Write a blog on Attention is all you need paper"))
+    logging.info(out)
+
 

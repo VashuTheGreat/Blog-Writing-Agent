@@ -5,11 +5,18 @@ def error_message_detail(error: Exception, error_detail: sys) -> str:
    
     _, _, exc_tb = error_detail.exc_info()
 
-    # Get the file name where the exception occurred
-    file_name = exc_tb.tb_frame.f_code.co_filename
+    if exc_tb is not None:
+        # Get the file name where the exception occurred
+        file_name = exc_tb.tb_frame.f_code.co_filename
+        line_number = exc_tb.tb_lineno
+    else:
+        # Fallback to current frame info if no traceback (e.g. manual raise)
+        import inspect
+        frame = inspect.currentframe().f_back.f_back # Go back to where MyException was called
+        file_name = frame.f_code.co_filename
+        line_number = frame.f_lineno
 
     # Create a formatted error message string with file name, line number, and the actual error
-    line_number = exc_tb.tb_lineno
     error_message = f"Error occurred in python script: [{file_name}] at line number [{line_number}]: {str(error)}"
     
     # Log the error for better tracking

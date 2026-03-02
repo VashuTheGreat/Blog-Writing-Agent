@@ -11,7 +11,7 @@ class Task(BaseModel):
     )
     bullets: List[str] = Field(
         ...,
-        min_length=3,
+        min_length=2,
         max_length=5,
         description="3–5 concrete, non-overlapping subpoints to cover in this section.",
     )

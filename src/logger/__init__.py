@@ -35,6 +35,9 @@ def configure_logger():
     console_handler=logging.StreamHandler()
     console_handler.setFormatter(formater)
     console_handler.setLevel(logging.INFO)
+    # Ensure console output uses UTF-8 to prevent character mapping errors on Windows
+    if hasattr(console_handler.stream, 'reconfigure'):
+        console_handler.stream.reconfigure(encoding='utf-8')
 
     logger.addHandler(file_handler)
     logger.addHandler(console_handler)

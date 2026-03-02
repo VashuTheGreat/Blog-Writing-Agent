@@ -55,4 +55,5 @@ async def run(topic: str):
 
 if __name__ == "__main__":
     from src.logger import *
-    asyncio.run(run("State of Multimodal LLMs in 2026"))
+    out=asyncio.run(run("State of Multimodal LLMs in 2026"))
+    print(out)

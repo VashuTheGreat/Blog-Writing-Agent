@@ -41,7 +41,7 @@ Hard requirements:
 - Create 5–9 sections (tasks) suitable for the topic and audience.
 - Each task must include:
   1) goal (1 sentence)
-  2) 3–6 bullets that are concrete, specific, and non-overlapping
+  2) 2–6 bullets that are concrete, specific, and non-overlapping
   3) target word count (120–550)
 
 Quality bar:

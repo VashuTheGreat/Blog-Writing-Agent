@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "fastapi>=0.135.1",
     "google-genai>=1.64.0",
     "huggingface-hub>=1.4.1",
     "langchain>=1.2.10",
@@ -16,4 +17,6 @@ dependencies = [
     "langgraph>=1.0.8",
     "pillow>=12.1.1",
     "pydantic>=2.12.5",
+    "streamlit>=1.54.0",
+    "uvicorn>=0.41.0",
 ]
