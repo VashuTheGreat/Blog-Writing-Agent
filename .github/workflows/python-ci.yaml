@@ -1,4 +1,4 @@
-name: Python CI
+name: Python CI/CD
 
 on:
   push:
@@ -9,6 +9,7 @@ on:
       - main
 
 jobs:
+
   test:
     runs-on: ubuntu-latest
 
@@ -21,10 +22,35 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install uv
+        run: curl -Ls https://astral.sh/uv/install.sh | sh
+
+      - name: Add uv to PATH
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+        run: uv sync
 
       - name: Run tests
-        run: pytest
+        run: uv run pytest
+
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            export PATH="$HOME/.local/bin:$PATH"
+            cd /var/www/blog-agent
+            git pull origin main
+            uv sync
+            pkill -f uvicorn || true
+            nohup uv run uvicorn Application.app:app --host 0.0.0.0 --port 8000 > output.log 2>&1 &
