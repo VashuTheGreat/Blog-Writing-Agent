@@ -1,0 +1,177 @@
+===============================
+EC2 FastAPI Deployment Notes
+===============================
+
+PROJECT: Blog Writing Agent
+STACK: FastAPI + uv + systemd + GitHub Actions CI/CD
+
+
+--------------------------------------------------
+1️⃣ Create systemd Service File
+--------------------------------------------------
+
+Command:
+sudo nano /etc/systemd/system/blog-agent.service
+
+Why?
+- /etc/systemd/system/ is system-level directory
+- Normal user cannot create files here
+- sudo required for admin access
+- This file defines how our app runs as a service
+
+
+--------------------------------------------------
+2️⃣ Service File Content
+--------------------------------------------------
+
+[Unit]
+Description=Blog Agent FastAPI App
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/var/www/blog-agent
+ExecStart=/home/ubuntu/.local/bin/uv run uvicorn Application.app:app --host 0.0.0.0 --port 8000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+
+Why each line?
+
+User=ubuntu
+→ Runs app as ubuntu user (safer than root)
+
+WorkingDirectory
+→ Tells system where project exists
+
+ExecStart
+→ Exact command to start FastAPI app
+
+Restart=always
+→ If app crashes, systemd restarts it automatically
+
+WantedBy=multi-user.target
+→ Makes service start when system boots
+
+
+--------------------------------------------------
+3️⃣ Reload systemd
+--------------------------------------------------
+
+Command:
+sudo systemctl daemon-reload
+
+Why?
+- After creating new service file
+- systemd must reload configuration
+- Otherwise it won’t detect new service
+
+
+--------------------------------------------------
+4️⃣ Enable Service (Auto Start on Reboot)
+--------------------------------------------------
+
+Command:
+sudo systemctl enable blog-agent
+
+Why?
+- Makes app start automatically when server reboots
+- Without this, service won’t auto start
+
+
+--------------------------------------------------
+5️⃣ Start Service
+--------------------------------------------------
+
+Command:
+sudo systemctl start blog-agent
+
+Why?
+- Immediately start app without reboot
+
+
+--------------------------------------------------
+6️⃣ Check Status
+--------------------------------------------------
+
+Command:
+sudo systemctl status blog-agent
+
+Why?
+- Verify if service is running
+- Shows logs and errors if any
+
+
+--------------------------------------------------
+7️⃣ Restart During Deployment (Used in CD)
+--------------------------------------------------
+
+Command:
+sudo systemctl restart blog-agent
+
+Why?
+- After git pull & uv sync
+- Restart loads latest code
+- Clean exit code (no 143 error)
+- GitHub Actions shows GREEN ✔
+
+
+--------------------------------------------------
+🚀 Why We Stopped Using nohup & ?
+--------------------------------------------------
+
+Problem:
+- SSH session close → background process killed
+- GitHub showed "Process exited with status 143"
+- Deployment looked failed even though server updated
+
+Solution:
+- Use systemd service
+- App runs independently of SSH
+- Clean process management
+- Production ready setup
+
+
+--------------------------------------------------
+🎯 Final Deployment Flow
+--------------------------------------------------
+
+GitHub Push
+   ↓
+CI Run (Tests)
+   ↓
+CD SSH into EC2
+   ↓
+git pull origin main
+uv sync
+sudo systemctl restart blog-agent
+   ↓
+App Updated Successfully
+
+
+--------------------------------------------------
+🔥 Important Concepts Learned
+--------------------------------------------------
+
+✔ Difference between normal user & root
+✔ What sudo does
+✔ What systemd is
+✔ Why production apps use services
+✔ Why background (&, nohup) is not production safe
+✔ Why exit code 143 happens
+✔ Proper CI/CD deployment architecture
+
+
+--------------------------------------------------
+🏆 Result
+--------------------------------------------------
+
+App:
+- Auto restarts if crashed
+- Auto starts on server reboot
+- Independent of SSH
+- Clean GitHub deployment (Green tick)
+
+Production-level deployment achieved.
