@@ -53,10 +53,5 @@ jobs:
             cd /var/www/blog-agent
             git pull origin main
             uv sync
-            pkill -f uvicorn || true
-            setsid uv run uvicorn Application.app:app \
-              --host 0.0.0.0 \
-              --port 8000 \
-              > output.log 2>&1 < /dev/null &
-            sleep 5
+            sudo systemctl restart blog-agent
             echo "Deployment successful"
