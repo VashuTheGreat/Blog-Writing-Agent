@@ -19,5 +19,7 @@ dependencies = [
     "pydantic>=2.12.5",
     "pytest>=9.0.2",
     "streamlit>=1.54.0",
+    "python-dotenv>=1.0.1",
+    "from-root>=1.1.0",
     "uvicorn>=0.41.0",
 ]
