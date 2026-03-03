@@ -1,0 +1,17 @@
+services:
+  app:
+    build: .
+    image: bloggingagent:latest
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./images:/app/images
+      - ./results:/app/results
+      - ./logs:/app/logs
+    restart: always
+
+# Ensure directories exist for volume mapping
+# Note: Docker will create them as root if they don't exist,
+# but the app might need write permissions.
