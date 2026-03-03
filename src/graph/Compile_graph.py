@@ -35,7 +35,19 @@ with open("graph.png", "wb") as f:
 async def run(topic: str):
     logging.info(f"Starting blog generation for topic: {topic}")
     try:
-        out = await app.ainvoke(
+        # out = await app.ainvoke(
+        #     {
+        #         "topic": topic,
+        #         "mode": "",
+        #         "needs_research": False,
+        #         "queries": [],
+        #         "evidence": [],
+        #         "plan": None,
+        #         "sections": [],
+        #         "final": "",
+        #     }
+        # )
+        async for step in app.astream(
             {
                 "topic": topic,
                 "mode": "",
@@ -45,10 +57,13 @@ async def run(topic: str):
                 "plan": None,
                 "sections": [],
                 "final": "",
-            }
-        )
+            },
+            stream_mode="values"   # important
+        ):
+            # print("Current Step:", step)
+            yield step
         logging.info("Blog generation completed successfully")
-        return out
+        return
     except Exception as e:
         logging.error(f"Error during graph execution: {str(e)}")
         raise
