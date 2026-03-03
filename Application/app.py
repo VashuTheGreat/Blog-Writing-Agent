@@ -126,4 +126,4 @@ async def download_blog(title: str):
     )
 
 if __name__ == "__main__":
-    uv.run("app:app", host="0.0.0.0", port=8000, reload=True)
+    uv.run("app:app", host="0.0.0.0", port=8000, reload=False)
