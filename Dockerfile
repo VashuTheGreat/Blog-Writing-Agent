@@ -35,4 +35,4 @@ EXPOSE 7860
 ENV PYTHONUNBUFFERED=1
 
 # Run the application
-CMD ["python", "Application/app.py"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7860"]
