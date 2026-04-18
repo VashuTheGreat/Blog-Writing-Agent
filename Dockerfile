@@ -29,7 +29,7 @@ ENV PATH="/app/.venv/bin:$PATH"
 COPY . .
 
 # Expose the port the app runs on
-EXPOSE 8000
+EXPOSE 7860
 
 # Set environment variables for the application
 ENV PYTHONUNBUFFERED=1

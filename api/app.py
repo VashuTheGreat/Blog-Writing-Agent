@@ -10,13 +10,12 @@ from fastapi.responses import HTMLResponse, FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List
-import uvicorn as uv
 
-PROJECT_ROOT = os.getcwd()
-if PROJECT_ROOT not in sys.path:
-    sys.path.append(PROJECT_ROOT)
+# PROJECT_ROOT = os.getcwd()
+# if PROJECT_ROOT not in sys.path:
+#     sys.path.append(PROJECT_ROOT)
 
-from src.logger import *
+# from src.logger import *
 from src.graph.Compile_graph import run
 from src.utils.blog_utils import delete_blog_content
 
@@ -34,7 +33,7 @@ class BlogDeleteRequest(BaseModel):
 
 @app.get("/")
 async def home():
-    with open("Application/index.html", "r", encoding="utf-8") as f:
+    with open("api/templates/index.html", "r", encoding="utf-8") as f:
         return HTMLResponse(f.read())
 
 @app.get("/blogs")
@@ -124,6 +123,3 @@ async def download_blog(title: str):
         media_type="application/x-zip-compressed",
         headers={"Content-Disposition": f"attachment; filename={title}.zip"}
     )
-
-if __name__ == "__main__":
-    uv.run("app:app", host="0.0.0.0", port=8000, reload=False)
